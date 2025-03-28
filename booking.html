@@ -1,6 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,400i,500,500i,600,600i,700,700i&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ 
+    <link rel="stylesheet" href="css/animate.css">
+    
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" href="css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
+
+    <link rel="stylesheet" href="css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="css/jquery.timepicker.css">
+
+    <link rel="stylesheet" href="css/flaticon.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: white;
+            color: #fff;
+            text-align: center;
+        }
+        .booking-form {
+            width: 100%;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 25px;
+            background:black;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px pink(255, 215, 0, 0.5);
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            color: pink;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid pink;
+            background: grey;
+            color: #fff;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: pink;
+            color: #1a1a1a;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: pink;
+        }
+        .whatsapp-chat {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+        .whatsapp-chat img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 2px 2px 10px rgba(255, 215, 0, 0.5);
+        }
+        .whatsapp-chat:hover {
+            transform: scale(1.1);
+        }
+    </style>
+    
     <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -32,6 +119,53 @@
     </style>
 </head>
 <body>
+    <div class="wrap">
+        <div class="container">
+            <div class="row justify-content-between">
+                    <div class="col d-flex align-items-center">
+                        <p class="mb-0 phone"><span class="mailus">Phone no:</span> <a href="phone">+234 8169267198</a> or <span class="mailus">email us:</span> <a href="mailto:hdlc.bookings@gmail.com">hdlc.bookings@gmail.com</a></p>
+                    </div>
+                    <div class="col d-flex justify-content-end">
+                        <div class="social-media">
+                        <p class="mb-0 d-flex">
+                            <a href="#" class="d-flex align-items-center justify-content-center"><span class="fa fa-facebook"><i class="sr-only">Facebook</i></span></a>
+                            <a href="https://www.tiktok.com/@shortlet_in_ota?is_from_webapp=1&sender_device=pc" class="d-flex align-items-center justify-content-center"><span class="fa-brands fa-tiktok"><i class="sr-only">Twitter</i></span></a>
+                            <a href="https://www.instagram.com/shortlet_in_ota?igsh=bmIyencxcnVob3o5" class="d-flex align-items-center justify-content-center"><span class="fa fa-instagram"><i class="sr-only">Instagram</i></span></a>
+                            <a href="#" class="d-flex align-items-center justify-content-center"><span class="fa fa-dribbble"><i class="sr-only">Dribbble</i></span></a>
+                        </p>
+                </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">Havre De<span>La Calme</span></a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="fa fa-bars"></span> Menu
+      </button>
+      <div class="collapse navbar-collapse" id="ftco-nav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-item"><a href="services.html" class="nav-link">Services</a></li>
+            <li class="nav-item"><a href="rooms.html" class="nav-link">Apartment Room</a></li>
+          <li class="nav-item active"><a href="contact.html" class="nav-link">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+<!-- END nav -->
+<section class="hero-wrap hero-wrap-2" style="background-image: url('images/Havre\ logo.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row no-gutters slider-text align-items-center justify-content-center">
+        <div class="col-md-9 ftco-animate text-center">
+            <p class="breadcrumbs mb-2"><span class="mr-2"><a href="index.html">Home <i class="fa fa-chevron-right"></i></a></span> <span>Contact <i class="fa fa-chevron-right"></i></span></p>
+          <h1 class="mb-0 bread">Contact Us</h1>
+        </div>
+      </div>
+    </div>
+  </section>
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5N4J57MT"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -50,15 +184,12 @@
         </div>
         <div class="form-group">
             <label for="phone">Phone:</label>
-            <input type="text" id="phone" name="phone" required>
+            <input type="number" onkeypress="return event.charCode >= 48 && event.charCode <= 57" id="phone" name="phone" required>
         </div>
         <div class="form-group">
             <label for="service">Service:</label>
             <select id="service" name="service" required>
-                <option value="Massage Therapy">Massage Therapy</option>
-                <option value="Meditation">Meditation</option>
-                <option value="Yoga">Yoga</option>
-                <option value="Custom Wellness Package">Custom Wellness Package</option>
+                <option value="Massage Therapy">Reservation</option>
             </select>
         </div>
         <div class="form-group">
@@ -74,5 +205,13 @@
 </div>
 <script src="//code.jivosite.com/widget/sb7AARmIVX" async></script>
 
+
+<!-----Whatsapp Chat Icon-------->
+	<a href="https://wa.me/2348169267198" class="whatsapp-chat" target="_blank">
+		<img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="Chat with us on WhatsApp">
+	  </a>
+	  <!-----End of Code for whatsapp Chat Icon-------->
+
+      
 </body>
 </html>
