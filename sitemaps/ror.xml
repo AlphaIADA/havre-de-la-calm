@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:ror="http://rorweb.com/0.1/" >
+<channel>
+  <title>ROR Sitemap for https://www.otaapartments.com/</title>
+  <link>https://www.otaapartments.com/</link>
+
+<item>
+     <link>https://www.otaapartments.com/</link>
+     <title>Havre De La Calme/shortlet apartment</title>
+     <description>Havre De La Calme/shortlet apartment</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>0</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.otaapartments.com/index.html</link>
+     <title>Havre De La Calme/shortlet apartment</title>
+     <description>Havre De La Calme/shortlet apartment</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.otaapartments.com/services.html</link>
+     <title>Havre De La Calme</title>
+     <description>Havre De La Calme</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.otaapartments.com/rooms.html</link>
+     <title>Havre De La Calme/Vacation Home</title>
+     <description>Havre De La Calme/Vacation Home</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://www.otaapartments.com/contact.html</link>
+     <title>Havre/affordable service apartment </title>
+     <description>Havre/affordable service apartment </description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+</channel>
+</rss>
+  
