@@ -114,20 +114,25 @@
     <section class="ftco-section ftco-book ftco-no-pt ftco-no-pb">
     	<div class="container">
 	    	<div class="row justify-content-end">
-	    		<div class="col-lg-4">
-						<form action="#" class="appointment-form">
-							<h3 class="mb-3">Book your apartment</h3>
-							<div class="row">
-								<div class="col-md-12">
-									<div class="form-group">
-			    					<input type="text" class="form-control" placeholder="Full Name">
-			    				</div>
-								</div>
+                        <div class="col-lg-4">
+                                                <form action="send_booking.php" method="POST" class="appointment-form">
+                                                        <h3 class="mb-3">Book your apartment</h3>
+                                                        <div class="row">
+                                                                <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                <input type="text" class="form-control" name="name" placeholder="Full Name" required>
+                                                        </div>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                <input type="email" class="form-control" name="email" placeholder="Email" required>
+                                                        </div>
+                                                                </div>
 								<div class="col-md-6">
 									<div class="form-group">
 			    					<div class="input-wrap">
 			            		<div class="icon"><span class="ion-md-calendar"></span></div>
-			            		<input type="text" class="form-control appointment_date-check-in" placeholder="Check-In">
+                                                <input type="date" class="form-control appointment_date-check-in" name="checkin" placeholder="Check-In" required>
 		            		</div>
 			    				</div>
 								</div>
@@ -135,7 +140,7 @@
 									<div class="form-group">
 			    					<div class="input-wrap">
 			            		<div class="icon"><span class="ion-md-calendar"></span></div>
-			            		<input type="text" class="form-control appointment_date-check-out" placeholder="Check-Out">
+                                                <input type="date" class="form-control appointment_date-check-out" name="checkout" placeholder="Check-Out" required>
 		            		</div>
 			    				</div>
 								</div>
@@ -144,14 +149,14 @@
 			    					<div class="form-field">
 	          					<div class="select-wrap">
 	                      <div class="icon"><span class="fa fa-chevron-down"></span></div>
-	                      <select name="" id="" class="form-control">
-	                      	<option value="">Adults</option>
-	                        <option value="">1</option>
-	                        <option value="">2</option>
-	                        <option value="">3</option>
-	                        <option value="">4</option>
-	                        <option value="">5</option>
-	                      </select>
+                              <select name="adults" class="form-control" required>
+                                <option value="" disabled selected>Adults</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                              </select>
 	                    </div>
 			              </div>
 			    				</div>
@@ -161,36 +166,37 @@
 			    					<div class="form-field">
 	          					<div class="select-wrap">
 	                      <div class="icon"><span class="fa fa-chevron-down"></span></div>
-	                      <select name="" id="" class="form-control">
-	                      	<option value="">Children</option>
-	                        <option value="">1</option>
-	                        <option value="">2</option>
-	                        <option value="">3</option>
-	                        <option value="">4</option>
-	                        <option value="">5</option>
-	                      </select>
+                              <select name="children" class="form-control" required>
+                                <option value="" disabled selected>Children</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                              </select>
 	                    </div>
 			              </div>
 			    				</div>
 								</div>
 								<div class="col-md-6">
 									<div class="form-group">
-			    					<input type="number" class="form-control" placeholder="Phone number">
+                                                                <input type="tel" class="form-control" name="phone" placeholder="Phone number" required>
 			    				</div>
 								</div>
 								<div class="col-md-6">
 									<div class="form-group">
 			    					<div class="input-wrap">
 			            		<div class="icon"><span class="ion-ios-clock"></span></div>
-			            		<input type="text" class="form-control appointment_time" placeholder="Time">
+                                                <input type="time" class="form-control appointment_time" name="time" placeholder="Time" required>
 		            		</div>
 			    				</div>
 								</div>
-								<div class="col-md-12">
-									<div class="form-group">
-			              <input type="submit" value="Book Appartment Now" class="btn btn-primary py-3 px-4">
-			            </div>
-								</div>
+                                                                <input type="hidden" name="service" value="Apartment Booking">
+                                                                <div class="col-md-12">
+                                                                        <div class="form-group">
+                                        <input type="submit" value="Book Apartment Now" class="btn btn-primary py-3 px-4">
+                                      </div>
+                                                                </div>
 							</div>
 	    			</form>
 	    		</div>
