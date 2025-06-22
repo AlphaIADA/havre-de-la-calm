@@ -9,8 +9,8 @@
 
 <url>
   <loc>https://www.otaapartments.com/</loc>
-  <lastmod>2025-03-29T15:09:26+00:00</lastmod>
-  <priority>1.00</priority>
+  <changefreq>daily</changefreq>
+  <priority>1.0</priority>
 </url>
 <url>
   <loc>https://www.otaapartments.com/index.html</loc>
@@ -33,5 +33,11 @@
   <priority>0.80</priority>
 </url>
 
+
+  <url>
+    <loc>https://www.otaapartments.com/sango-ota/2-bedroom.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
 </urlset>
