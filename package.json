@@ -3,14 +3,19 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "npm run clean && next dev",
     "build": "next build",
     "start": "next start",
+    "clean": "node -e \"const fs=require('fs'); for (const p of ['.next','.turbo']) { try { fs.rmSync(p,{recursive:true,force:true}); } catch {} }\"",
     "lint": "next lint",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts"
+  },
+  "engines": {
+    "node": ">=20.0.0 <23.0.0"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",

@@ -17,6 +17,9 @@ Multi-property short-stay booking platform with:
 - Cloudinary private uploads (KYC docs)
 - Paystack (optional)
 
+## Node version
+- Use Node 20 LTS or 22 LTS (see `.nvmrc`). Newer Node versions (e.g. Node 25) can cause flaky Next.js dev-server errors.
+
 ## Quickstart
 
 1) Install deps:
@@ -35,6 +38,11 @@ npm run db:seed
 4) Start dev server:
 ```bash
 npm run dev
+```
+
+If you hit a weird `.next/server/app/... ENOENT` error, run:
+```bash
+npm run dev:clean
 ```
 
 ## Environment variables
