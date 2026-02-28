@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-white text-zinc-900 antialiased;
+}
+
+.container-px {
+  @apply mx-auto w-full max-w-6xl px-4;
+}
+

@@ -1,0 +1,453 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  STAFF
+  GUEST
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CHECKED_IN
+  CHECKED_OUT
+  CANCELLED
+}
+
+enum BookingSource {
+  ONLINE
+  OFFLINE
+}
+
+enum PayMode {
+  PAY_NOW
+  PAY_LATER
+}
+
+enum PaymentProvider {
+  PAYSTACK
+  OFFLINE
+}
+
+enum PaymentStatus {
+  INITIATED
+  SUCCESS
+  FAILED
+}
+
+enum KycStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum KycDocumentKind {
+  ID_FRONT
+  ID_BACK
+  SELFIE
+  PROOF_OF_ADDRESS
+}
+
+enum KycDocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MessageThreadStatus {
+  OPEN
+  CLOSED
+}
+
+enum MessageSenderRole {
+  GUEST
+  STAFF
+}
+
+enum PromoCodeType {
+  PERCENT
+  FIXED
+}
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum EmailCampaignStatus {
+  DRAFT
+  SENDING
+  SENT
+  FAILED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  passwordHash String?
+  role         UserRole  @default(GUEST)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  auditLogs      AuditLog[]
+  kycReviewed    KycProfile[]    @relation("KycReviewedBy")
+  kycDocsReviewed KycDocument[]  @relation("KycDocReviewedBy")
+  messagesSent   Message[]
+  postsCreated   BlogPost[]
+}
+
+model Property {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  location    String
+  address     String?
+  heroImage   String?
+  gallery     Json?
+  amenities   Json?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  units    Unit[]
+  bookings Booking[]
+  messageThreads MessageThread[]
+  promoCodes PromoCode[]
+}
+
+model Unit {
+  id            String   @id @default(cuid())
+  propertyId    String
+  slug          String   @unique
+  name          String
+  summary       String?
+  description   String?
+  maxGuests     Int
+  minNights     Int      @default(1)
+  baseNightly   Int
+  weekendNightly Int?
+  cleaningFee   Int      @default(0)
+  depositFee    Int      @default(0)
+  images        Json?
+  amenities     Json?
+  rules         Json?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  property          Property          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  availabilityBlocks AvailabilityBlock[]
+  bookings          Booking[]
+  messageThreads    MessageThread[]
+  promoCodes        PromoCode[]
+
+  @@index([propertyId])
+}
+
+model AvailabilityBlock {
+  id        String   @id @default(cuid())
+  unitId    String
+  startDate DateTime
+  endDate   DateTime
+  reason    String?
+  createdAt DateTime @default(now())
+
+  unit Unit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+
+  @@index([unitId])
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  code        String        @unique
+  source      BookingSource @default(ONLINE)
+  status      BookingStatus @default(PENDING)
+  payMode     PayMode       @default(PAY_LATER)
+  currency    String        @default("NGN")
+
+  propertyId  String
+  unitId      String
+  promoCodeId String?
+  discountAmount Int        @default(0)
+
+  checkIn     DateTime
+  checkOut    DateTime
+  nights      Int
+  adults      Int           @default(1)
+  children    Int           @default(0)
+
+  nightlyTotal Int
+  cleaningFee  Int          @default(0)
+  depositFee   Int          @default(0)
+  totalAmount  Int
+
+  guestName   String
+  guestEmail  String
+  guestPhone  String
+
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  property    Property      @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  unit        Unit          @relation(fields: [unitId], references: [id], onDelete: Restrict)
+  promoCode   PromoCode?    @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
+
+  payments     Payment[]
+  kycProfile   KycProfile?
+  messageThreads MessageThread[]
+
+  @@index([propertyId])
+  @@index([unitId])
+  @@index([status])
+  @@index([source])
+  @@index([promoCodeId])
+}
+
+model Payment {
+  id        String          @id @default(cuid())
+  bookingId String
+  provider  PaymentProvider @default(PAYSTACK)
+  reference String          @unique
+  status    PaymentStatus   @default(INITIATED)
+  amount    Int
+  currency  String          @default("NGN")
+  raw       Json?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([status])
+}
+
+model KycProfile {
+  id                 String    @id @default(cuid())
+  bookingId           String    @unique
+  status             KycStatus @default(PENDING)
+
+  fullName           String
+  email              String
+  phone              String
+  address            String?
+  nationality        String?
+
+  nextOfKinName      String?
+  nextOfKinPhone     String?
+  emergencyName      String?
+  emergencyPhone     String?
+
+  termsAcceptedAt    DateTime?
+  signatureText      String?
+
+  reviewNotes        String?
+  reviewedAt         DateTime?
+  reviewedById       String?
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  booking    Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  documents  KycDocument[]
+  reviewedBy User?       @relation("KycReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+}
+
+model KycDocument {
+  id           String           @id @default(cuid())
+  profileId    String
+  kind         KycDocumentKind
+  status       KycDocumentStatus @default(PENDING)
+
+  storageProvider String        @default("cloudinary")
+  storageKey      String        // e.g. Cloudinary public_id
+  resourceType    String?       // image | raw
+  fileName        String?
+  mimeType        String?
+  fileSize        Int?
+  meta            Json?
+
+  reviewNotes     String?
+  reviewedAt      DateTime?
+  reviewedById    String?
+
+  createdAt     DateTime @default(now())
+
+  profile   KycProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  reviewedBy User?     @relation("KycDocReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([profileId])
+  @@index([status])
+  @@index([kind])
+}
+
+model MessageThread {
+  id         String             @id @default(cuid())
+  status     MessageThreadStatus @default(OPEN)
+  subject    String?
+
+  guestName  String?
+  guestEmail String?
+
+  bookingId  String?
+  unitId     String?
+  propertyId String?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  booking  Booking?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  unit     Unit?     @relation(fields: [unitId], references: [id], onDelete: SetNull)
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+
+  messages Message[]
+
+  @@index([status])
+  @@index([bookingId])
+  @@index([unitId])
+  @@index([propertyId])
+}
+
+model Message {
+  id        String           @id @default(cuid())
+  threadId  String
+  senderRole MessageSenderRole
+  senderUserId String?
+  body      String
+  createdAt DateTime         @default(now())
+
+  thread MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderUser User?     @relation(fields: [senderUserId], references: [id], onDelete: SetNull)
+
+  @@index([threadId])
+  @@index([senderRole])
+}
+
+model PromoCode {
+  id             String        @id @default(cuid())
+  code           String        @unique
+  type           PromoCodeType
+  amount         Int
+  active         Boolean       @default(true)
+  maxRedemptions Int?
+  redeemedCount  Int           @default(0)
+  expiresAt      DateTime?
+  propertyId     String?
+  unitId         String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  unit     Unit?     @relation(fields: [unitId], references: [id], onDelete: SetNull)
+  bookings Booking[]
+
+  @@index([active])
+  @@index([expiresAt])
+}
+
+model BlogCategory {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  posts BlogPost[]
+}
+
+model BlogTag {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  postTags BlogPostTag[]
+}
+
+model BlogPost {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  title          String
+  excerpt        String?
+  content        String
+  status         BlogPostStatus @default(DRAFT)
+  publishedAt    DateTime?
+  seoTitle       String?
+  seoDescription String?
+  ogImage        String?
+  canonicalUrl   String?
+
+  categoryId     String?
+  createdById    String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  category  BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdBy User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  tags      BlogPostTag[]
+}
+
+model BlogPostTag {
+  postId String
+  tagId  String
+
+  post BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  BlogTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@index([tagId])
+}
+
+model EmailSegment {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  criteria  Json
+  createdAt DateTime @default(now())
+
+  campaigns EmailCampaign[]
+}
+
+model EmailCampaign {
+  id          String             @id @default(cuid())
+  name        String
+  subject     String
+  html        String
+  status      EmailCampaignStatus @default(DRAFT)
+
+  segmentId   String?
+  sendStartedAt DateTime?
+  sentAt      DateTime?
+  recipientTotal Int?
+  sentCount   Int                @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  segment EmailSegment? @relation(fields: [segmentId], references: [id], onDelete: SetNull)
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String?
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([action])
+}
