@@ -58,10 +58,9 @@ export function AdminLoginForm() {
         {pending ? 'Signing in…' : 'Sign in'}
       </Button>
       <p className="text-xs text-zinc-500">
-        Requires seeded admin user. Env vars: DATABASE_URL, ADMIN_EMAIL, ADMIN_PASSWORD,
-        ADMIN_SESSION_SECRET.
+        Admin access is restricted to staff accounts. If you need access, contact the site
+        administrator.
       </p>
     </form>
   );
 }
-

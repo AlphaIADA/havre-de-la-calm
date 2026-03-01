@@ -38,8 +38,8 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
           <div className="space-y-2">
             <h2 className="text-base font-semibold">Database not configured</h2>
             <p className="text-sm text-zinc-600">
-              Set <span className="font-medium">DATABASE_URL</span> and run migrations to enable admin
-              features.
+              Admin features are unavailable until the database is connected and migrations have been
+              applied.
             </p>
           </div>
         )}

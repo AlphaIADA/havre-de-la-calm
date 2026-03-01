@@ -9,8 +9,7 @@ export default async function CheckinNewPage() {
   if (!isDbConfigured()) {
     return (
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-white/70">
-        Database is not configured. Set <span className="font-semibold text-white">DATABASE_URL</span>{' '}
-        and run migrations to enable offline check-in.
+        Offline check-in is not available yet. Please contact an administrator to complete setup.
       </div>
     );
   }
@@ -36,4 +35,3 @@ export default async function CheckinNewPage() {
 
   return <OfflineCheckinForm properties={props} units={us} />;
 }
-

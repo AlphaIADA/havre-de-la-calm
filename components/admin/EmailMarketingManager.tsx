@@ -87,7 +87,7 @@ export function EmailMarketingManager(props: { segments: Segment[]; campaigns: C
 
   const sendCampaign = (campaignId: string) => {
     if (!props.resendEnabled) {
-      toast.error('Sending disabled', { description: 'Configure RESEND_API_KEY and EMAIL_FROM.' });
+      toast.error('Sending disabled', { description: 'Email sending is not configured.' });
       return;
     }
     startTransition(async () => {

@@ -36,8 +36,7 @@ export default async function BookingPortalPage({
             Booking code: <span className="font-semibold text-zinc-900">{bookingCode}</span>
           </p>
           <div className="mt-6 rounded-3xl border border-zinc-200 bg-zinc-50 p-6 text-sm text-zinc-700">
-            Database is not configured yet. Set <span className="font-medium">DATABASE_URL</span>{' '}
-            and run migrations to enable booking status, KYC uploads, and messaging.
+            Booking portal is temporarily unavailable. Please try again later or contact support.
           </div>
         </div>
       </div>

@@ -51,9 +51,9 @@ export function GuestMessageForm(props: { bookingCode: string; guestName?: strin
         {pending ? 'Sending…' : 'Send message'}
       </Button>
       <p className="text-xs text-zinc-500">
-        Email notifications will be enabled when RESEND_API_KEY is configured.
+        You’ll see replies in this portal. Email notifications may not be available in all
+        environments.
       </p>
     </form>
   );
 }
-
