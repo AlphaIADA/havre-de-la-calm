@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import GoogleReviews from '@/components/GoogleReviews';
 import { Button } from '@/components/ui/Button';
 
 const featured = [
@@ -19,7 +20,6 @@ const featured = [
 ];
 
 export default function HomePage() {
-  const reviewsEmbedUrl = process.env.NEXT_PUBLIC_GOOGLE_REVIEWS_EMBED_URL ?? '';
   return (
     <div>
       <section className="relative overflow-hidden">
@@ -157,30 +157,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="container-px py-14">
-        <div className="max-w-2xl">
-          <h2 className="text-2xl font-semibold tracking-tight">Guest reviews</h2>
-          <p className="mt-2 text-sm text-zinc-600">
-            We’re working on an embedded Google Business reviews feed. For now, this section can be
-            enabled via an embed URL.
-          </p>
-        </div>
-
-        <div className="mt-6 overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm">
-          {reviewsEmbedUrl ? (
-            <iframe
-              src={reviewsEmbedUrl}
-              title="Google Reviews"
-              className="h-[520px] w-full"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          ) : (
-            <div className="p-6 text-sm text-zinc-700">
-              Set <span className="font-medium">NEXT_PUBLIC_GOOGLE_REVIEWS_EMBED_URL</span> to show the
-              Google reviews embed here.
-            </div>
-          )}
+      <section className="py-16">
+        <div className="container mx-auto">
+          <h2 className="mb-6 text-center text-3xl font-bold">Guest Reviews</h2>
+          <GoogleReviews />
         </div>
       </section>
     </div>

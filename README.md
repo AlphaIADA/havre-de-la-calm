@@ -81,8 +81,8 @@ If not set, emails are skipped silently.
 - `EMAIL_FROM` (e.g. `OTA Apartments <no-reply@otaapartments.com>`)
 - `EMAIL_REPLY_TO` (optional)
 
-### Reviews embed (optional)
-- `NEXT_PUBLIC_GOOGLE_REVIEWS_EMBED_URL` (iframe URL)
+### Reviews
+- Google Reviews widget is loaded via Elfsight in `components/GoogleReviews.tsx` (no env vars needed).
 
 ## Neon / DB setup
 - Create a Neon Postgres database.
