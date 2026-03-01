@@ -90,7 +90,7 @@ If not set, emails are skipped silently.
 - Run `npm run prisma:migrate` then `npm run db:seed`.
 
 ## Vercel domain + subdomain routing (checkin)
-This repo uses `middleware.ts` for host-based routing:
+This repo uses host-based rewrites in `next.config.js`:
 - Requests on `checkin.<rootDomain>` are rewritten to `/checkin/*`.
 
 In Vercel:
