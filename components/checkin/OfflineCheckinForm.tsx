@@ -63,6 +63,26 @@ export function OfflineCheckinForm({ properties, units }: { properties: Property
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!propertySlug) {
+      toast.error('Select a property');
+      return;
+    }
+    if (!unitSlug) {
+      toast.error('Select a unit');
+      return;
+    }
+    if (!checkIn || !checkOut) {
+      toast.error('Select check-in and check-out dates');
+      return;
+    }
+    if (!guestName.trim()) {
+      toast.error('Guest name is required');
+      return;
+    }
+    if (!guestPhone.trim()) {
+      toast.error('Phone number is required');
+      return;
+    }
     if (!termsAccepted) {
       toast.error('Terms must be accepted');
       return;
@@ -105,18 +125,27 @@ export function OfflineCheckinForm({ properties, units }: { properties: Property
         const bookingCode = body.bookingCode as string;
         setCreatedCode(bookingCode);
 
-        const uploads: Array<{ kind: string; file: File | null }> = [
-          { kind: 'ID_FRONT', file: idFront },
-          { kind: 'SELFIE', file: selfie },
-          { kind: 'PROOF_OF_ADDRESS', file: proofOfAddress },
-        ];
-        for (const u of uploads) {
-          if (u.file) await uploadDoc(bookingCode, u.kind, u.file);
-        }
+        toast.success('Offline booking created', { description: `Booking code: ${bookingCode}` });
 
-        toast.success('Offline booking created', {
-          description: `Booking code: ${bookingCode}`,
-        });
+        const uploads: Array<{ kind: string; file: File | null; label: string }> = [
+          { kind: 'ID_FRONT', file: idFront, label: 'ID front' },
+          { kind: 'SELFIE', file: selfie, label: 'Selfie' },
+          { kind: 'PROOF_OF_ADDRESS', file: proofOfAddress, label: 'Proof of address' },
+        ];
+
+        const selected = uploads.filter((u) => u.file);
+        if (selected.length) {
+          try {
+            for (const u of selected) {
+              await uploadDoc(bookingCode, u.kind, u.file as File);
+            }
+            toast.success('Uploads received', { description: 'Documents are queued for review.' });
+          } catch (err) {
+            toast.error('Booking created, but uploads failed', {
+              description: err instanceof Error ? err.message : 'Please upload from the guest portal.',
+            });
+          }
+        }
       } catch (err) {
         toast.error('Offline check-in failed', {
           description: err instanceof Error ? err.message : 'Please try again.',
@@ -173,6 +202,7 @@ export function OfflineCheckinForm({ properties, units }: { properties: Property
         <select
           value={unitSlug}
           onChange={(e) => setUnitSlug(e.target.value)}
+          disabled={pending || !propertyUnits.length}
           className="w-full rounded-2xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-white/20"
         >
           {propertyUnits.map((u) => (
@@ -181,6 +211,9 @@ export function OfflineCheckinForm({ properties, units }: { properties: Property
             </option>
           ))}
         </select>
+        {!propertyUnits.length ? (
+          <div className="text-xs text-white/60">No active units found for this property.</div>
+        ) : null}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -377,7 +410,7 @@ export function OfflineCheckinForm({ properties, units }: { properties: Property
 
       <button
         type="submit"
-        disabled={pending}
+        disabled={pending || !propertySlug || !unitSlug || !propertyUnits.length}
         className="inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-white/90 disabled:opacity-70"
       >
         {pending ? 'Submitting…' : 'Submit offline check-in'}

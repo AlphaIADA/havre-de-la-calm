@@ -10,6 +10,7 @@ const links = [
   { href: '/admin/kyc', label: 'KYC' },
   { href: '/admin/messages', label: 'Messages' },
   { href: '/admin/blog', label: 'Blog' },
+  { href: '/admin/blog/comments', label: 'Comments' },
   { href: '/admin/email', label: 'Email' },
 ];
 

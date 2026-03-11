@@ -1,22 +1,25 @@
 /** @type {import('next').NextConfig} */
+const r2PublicUrl = process.env.CLOUDFLARE_R2_PUBLIC_URL;
+let r2Hostname = null;
+try {
+  if (r2PublicUrl) r2Hostname = new URL(r2PublicUrl).hostname;
+} catch {
+  r2Hostname = null;
+}
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: '/',
-          has: [{ type: 'host', value: 'checkin\\..*' }],
-          destination: '/checkin',
-        },
-        {
-          source: '/((?!_next|api|checkin|.*\\..*).*)',
-          has: [{ type: 'host', value: 'checkin\\..*' }],
-          destination: '/checkin/$1',
-        },
-      ],
-    };
+  images: {
+    remotePatterns: [
+      ...(r2Hostname
+        ? [
+            { protocol: 'https', hostname: r2Hostname, pathname: '/**' },
+            { protocol: 'http', hostname: r2Hostname, pathname: '/**' },
+          ]
+        : []),
+      { protocol: 'https', hostname: '**.r2.dev', pathname: '/**' },
+    ],
   },
 };
 

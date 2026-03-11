@@ -24,7 +24,8 @@ export default async function PropertyPage({
         name: dbProperty.name,
         location: dbProperty.location,
         description: dbProperty.description,
-        heroImage: dbProperty.heroImage ?? '/images/bg_1.jpg',
+        gallery: jsonStringArray(dbProperty.gallery),
+        heroImage: dbProperty.heroImage ?? (jsonStringArray(dbProperty.gallery)[0] ?? '/images/bg_1.jpg'),
       }
     : getDemoPropertyBySlug(propertySlug);
 
@@ -44,6 +45,12 @@ export default async function PropertyPage({
     : getDemoUnitsForProperty(property.slug);
 
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://otaapartments.com').replace(/\/$/, '');
+  const jsonLdImage =
+    property.heroImage && property.heroImage.startsWith('http')
+      ? property.heroImage
+      : property.heroImage
+        ? `${baseUrl}${property.heroImage}`
+        : null;
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'LodgingBusiness',
@@ -51,7 +58,7 @@ export default async function PropertyPage({
     url: `${baseUrl}/properties/${property.slug}`,
     name: property.name,
     description: property.description,
-    image: property.heroImage ? [`${baseUrl}${property.heroImage}`] : undefined,
+    image: jsonLdImage ? [jsonLdImage] : undefined,
     address: {
       '@type': 'PostalAddress',
       addressLocality: property.location,
@@ -90,6 +97,22 @@ export default async function PropertyPage({
               <Image src={property.heroImage} alt={property.name} fill className="object-cover" />
             </div>
           </div>
+
+          {property.gallery?.length ? (
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              {property.gallery
+                .filter((src, idx, arr) => src && arr.indexOf(src) === idx)
+                .slice(0, 9)
+                .map((src) => (
+                  <div
+                    key={src}
+                    className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100"
+                  >
+                    <Image src={src} alt={property.name} fill className="object-cover" />
+                  </div>
+                ))}
+            </div>
+          ) : null}
         </div>
       </section>
 

@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
+import { ImageListField } from '@/components/admin/ImageListField';
 import { Button } from '@/components/ui/Button';
 
 type Unit = {
@@ -51,7 +52,7 @@ export function UnitEditor({ unit }: { unit: Unit }) {
   const [depositFee, setDepositFee] = React.useState(unit.depositFee);
   const [active, setActive] = React.useState(unit.active);
 
-  const [images, setImages] = React.useState(toLines(unit.images));
+  const [images, setImages] = React.useState<string[]>(unit.images ?? []);
   const [amenities, setAmenities] = React.useState(toLines(unit.amenities));
   const [rules, setRules] = React.useState(toLines(unit.rules));
 
@@ -71,7 +72,7 @@ export function UnitEditor({ unit }: { unit: Unit }) {
             weekendNightly: weekendNightly === '' ? null : weekendNightly,
             cleaningFee,
             depositFee,
-            images: fromLines(images),
+            images,
             amenities: fromLines(amenities),
             rules: fromLines(rules),
             active,
@@ -170,7 +171,7 @@ export function UnitEditor({ unit }: { unit: Unit }) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Cleaning fee</label>
+            <label className="text-sm font-medium">Booking fee</label>
             <input
               type="number"
               min={0}
@@ -190,18 +191,17 @@ export function UnitEditor({ unit }: { unit: Unit }) {
             />
           </div>
 
-          <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-medium">Images (one per line)</label>
-            <textarea
+          <div className="space-y-3 md:col-span-2">
+            <ImageListField
+              label="Unit images"
+              helpText="Upload images (Cloudflare R2) or paste a /public image path. Reorder to change the gallery order."
+              prefix={`units/${unit.slug}`}
+              multiple
+              maxFiles={30}
               value={images}
-              onChange={(e) => setImages(e.target.value)}
-              rows={4}
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-mono"
-              placeholder="/images/Standard Room.jpg"
+              onChange={setImages}
+              disabled={pending}
             />
-            <div className="text-xs text-zinc-500">
-              Use existing files from <span className="font-medium">public/images</span>.
-            </div>
           </div>
 
           <div className="space-y-2 md:col-span-2">
@@ -240,4 +240,3 @@ export function UnitEditor({ unit }: { unit: Unit }) {
     </div>
   );
 }
-

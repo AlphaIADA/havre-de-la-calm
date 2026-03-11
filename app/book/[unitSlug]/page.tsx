@@ -63,7 +63,7 @@ export default async function BookPage({ params }: { params: Promise<{ unitSlug:
             <div className="text-sm font-semibold">Price notes</div>
             <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-zinc-700">
               <li>Nightly price may differ on weekends.</li>
-              <li>Cleaning and refundable deposit may apply.</li>
+              <li>Booking fee and refundable deposit may apply.</li>
               <li>Promo codes can be applied during checkout.</li>
             </ul>
           </div>

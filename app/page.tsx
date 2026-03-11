@@ -126,32 +126,18 @@ export default function HomePage() {
               </p>
             </div>
             <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
-              <div className="text-sm font-semibold">Admin quick links</div>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <Link href="/admin">
-                  <Button variant="secondary" className="w-full">
-                    Dashboard
-                  </Button>
-                </Link>
-                <Link href="/admin/bookings">
-                  <Button variant="secondary" className="w-full">
-                    Bookings
-                  </Button>
-                </Link>
-                <Link href="/admin/kyc">
-                  <Button variant="secondary" className="w-full">
-                    KYC review
-                  </Button>
-                </Link>
-                <Link href="/admin/messages">
-                  <Button variant="secondary" className="w-full">
-                    Messages
-                  </Button>
-                </Link>
-              </div>
-              <p className="mt-4 text-xs text-zinc-500">
-                Admin area requires ADMIN/STAFF access.
+              <div className="text-sm font-semibold">Need help?</div>
+              <p className="mt-2 text-sm text-zinc-600">
+                Use the chat button to send a message, or contact support for urgent requests.
               </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link href="/contact">
+                  <Button variant="secondary">Contact</Button>
+                </Link>
+                <a href="https://wa.me/2348169267198" target="_blank" rel="noreferrer">
+                  <Button>WhatsApp</Button>
+                </a>
+              </div>
             </div>
           </div>
         </div>

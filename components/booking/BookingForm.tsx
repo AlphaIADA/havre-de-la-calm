@@ -197,7 +197,7 @@ export function BookingForm(props: {
               <span className="font-medium">₦{(quote?.nightlyTotal ?? pricePreview.nightlyTotal).toLocaleString()}</span>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <span>Cleaning fee</span>
+              <span>Booking fee</span>
               <span className="font-medium">₦{(quote?.cleaningFee ?? pricePreview.cleaningFee).toLocaleString()}</span>
             </div>
             <div className="flex items-center justify-between gap-4">

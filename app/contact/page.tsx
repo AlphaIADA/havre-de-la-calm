@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { BookingLookupForm } from '@/components/booking/BookingLookupForm';
 import { Button } from '@/components/ui/Button';
 
 export const metadata = {
@@ -43,10 +44,8 @@ export default function ContactPage() {
             <p className="mt-2 text-sm text-zinc-600">
               If you already have a booking, open your guest portal using your code:
             </p>
-            <div className="mt-4 text-sm">
-              <span className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-zinc-700">
-                /booking/&lt;code&gt;
-              </span>
+            <div className="mt-5">
+              <BookingLookupForm />
             </div>
           </div>
         </aside>
@@ -54,4 +53,3 @@ export default function ContactPage() {
     </div>
   );
 }
-

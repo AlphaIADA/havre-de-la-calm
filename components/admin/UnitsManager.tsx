@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
+import { ImageListField } from '@/components/admin/ImageListField';
 import { Button } from '@/components/ui/Button';
 
 type Property = { id: string; name: string };
@@ -23,6 +24,10 @@ type Unit = {
   active: boolean;
 };
 
+function isValidSlug(value: string) {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
+}
+
 export function UnitsManager({ units, properties }: { units: Unit[]; properties: Property[] }) {
   const router = useRouter();
   const [pending, startTransition] = React.useTransition();
@@ -36,6 +41,9 @@ export function UnitsManager({ units, properties }: { units: Unit[]; properties:
   const [weekendNightly, setWeekendNightly] = React.useState<number | ''>('');
   const [cleaningFee, setCleaningFee] = React.useState(0);
   const [depositFee, setDepositFee] = React.useState(0);
+  const [images, setImages] = React.useState<string[]>([]);
+
+  const slugOk = isValidSlug(slug);
 
   const onCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +62,7 @@ export function UnitsManager({ units, properties }: { units: Unit[]; properties:
             weekendNightly: weekendNightly === '' ? null : weekendNightly,
             cleaningFee,
             depositFee,
+            images,
           }),
         });
         if (!res.ok) {
@@ -63,6 +72,7 @@ export function UnitsManager({ units, properties }: { units: Unit[]; properties:
         toast.success('Unit created');
         setSlug('');
         setName('');
+        setImages([]);
         router.refresh();
       } catch (err) {
         toast.error('Could not create unit', {
@@ -100,90 +110,118 @@ export function UnitsManager({ units, properties }: { units: Unit[]; properties:
 
       <form onSubmit={onCreate} className="grid gap-3 rounded-3xl border border-zinc-200 bg-zinc-50 p-5">
         <div className="text-sm font-semibold">Create unit</div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <select
-            value={propertyId}
-            onChange={(e) => setPropertyId(e.target.value)}
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-            required
-          >
-            {properties.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-          <input
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder="Slug (e.g. havre-suite)"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-            required
-          />
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Unit name"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm md:col-span-2"
-            required
-          />
-          <div className="grid gap-3 md:grid-cols-2 md:col-span-2">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">Property</label>
+            <select
+              value={propertyId}
+              onChange={(e) => setPropertyId(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+              required
+            >
+              {properties.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">Slug</label>
+            <input
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-mono"
+              placeholder="havre-suite"
+              required
+              pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">Unit name</label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+              placeholder="Havre Suite"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Max guests</label>
             <input
               type="number"
               min={1}
               value={maxGuests}
               onChange={(e) => setMaxGuests(Number(e.target.value))}
               className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-              placeholder="Max guests"
               required
             />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Min nights</label>
             <input
               type="number"
               min={1}
               value={minNights}
               onChange={(e) => setMinNights(Number(e.target.value))}
               className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-              placeholder="Min nights"
               required
             />
           </div>
-          <div className="grid gap-3 md:grid-cols-2 md:col-span-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Base nightly (NGN)</label>
             <input
               type="number"
               min={0}
               value={baseNightly}
               onChange={(e) => setBaseNightly(Number(e.target.value))}
               className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-              placeholder="Base nightly (NGN)"
               required
             />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Weekend nightly (optional)</label>
             <input
               type="number"
               min={0}
               value={weekendNightly}
-              onChange={(e) =>
-                setWeekendNightly(e.target.value === '' ? '' : Number(e.target.value))
-              }
+              onChange={(e) => setWeekendNightly(e.target.value === '' ? '' : Number(e.target.value))}
               className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-              placeholder="Weekend nightly (optional)"
+              placeholder="Leave blank for same as base"
             />
           </div>
-          <div className="grid gap-3 md:grid-cols-2 md:col-span-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Booking fee</label>
             <input
               type="number"
               min={0}
               value={cleaningFee}
               onChange={(e) => setCleaningFee(Number(e.target.value))}
               className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-              placeholder="Cleaning fee"
             />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Refundable deposit</label>
             <input
               type="number"
               min={0}
               value={depositFee}
               onChange={(e) => setDepositFee(Number(e.target.value))}
               className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-              placeholder="Refundable deposit"
+            />
+          </div>
+
+          <div className="space-y-3 md:col-span-2">
+            <ImageListField
+              label="Unit images"
+              helpText="Upload images (Cloudflare R2) or paste a /public image path."
+              prefix={slugOk ? `units/${slug}` : ''}
+              multiple
+              maxFiles={30}
+              value={images}
+              onChange={setImages}
+              disabled={pending || !slugOk}
             />
           </div>
         </div>

@@ -3,9 +3,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
+import { BlogEngagement } from '@/components/blog/BlogEngagement';
 import { Button } from '@/components/ui/Button';
 import { getDemoBlogPost } from '@/lib/demoBlog';
-import { getBlogPostBySlug } from '@/lib/data/blog';
+import { getPublishedBlogPostWithEngagement } from '@/lib/data/blog';
 import { isDbConfigured } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +17,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const dbPost = isDbConfigured() ? await getBlogPostBySlug(slug) : null;
+  const dbPost = isDbConfigured() ? await getPublishedBlogPostWithEngagement(slug) : null;
   const demoPost = getDemoBlogPost(slug);
   const title = dbPost?.seoTitle ?? dbPost?.title ?? demoPost?.title;
   const description = dbPost?.seoDescription ?? dbPost?.excerpt ?? demoPost?.excerpt;
@@ -38,7 +39,7 @@ export async function generateMetadata({
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const dbPost = isDbConfigured() ? await getBlogPostBySlug(slug) : null;
+  const dbPost = isDbConfigured() ? await getPublishedBlogPostWithEngagement(slug) : null;
 
   const post = dbPost
     ? {
@@ -66,10 +67,41 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         <article className="prose prose-zinc mt-8 max-w-none">
-          {post.content.split('\n').map((line, idx) => (
-            <p key={idx}>{line}</p>
-          ))}
+          {post.content
+            .split('\n')
+            .map((line, idx) => {
+              const trimmed = line.trim();
+              if (!trimmed) return null;
+              const img = trimmed.match(/^!\[(.*)\]\((.+)\)$/);
+              if (img) {
+                const alt = img[1]?.trim() || 'Image';
+                const src = img[2]?.trim();
+                if (!src) return null;
+                return (
+                  <div
+                    key={`img-${idx}`}
+                    className="relative aspect-[16/10] overflow-hidden rounded-3xl border border-zinc-200 bg-zinc-100"
+                  >
+                    <Image src={src} alt={alt} fill className="object-cover" />
+                  </div>
+                );
+              }
+              return <p key={`p-${idx}`}>{trimmed}</p>;
+            })}
         </article>
+
+        {dbPost ? (
+          <BlogEngagement
+            slug={dbPost.slug}
+            initialComments={dbPost.comments.map((c) => ({
+              id: c.id,
+              name: c.name,
+              body: c.body,
+              createdAt: c.createdAt.toISOString(),
+            }))}
+            initialReactions={dbPost.reactions.map((r) => ({ emoji: r.emoji, count: r.count }))}
+          />
+        ) : null}
 
         <div className="mt-10 rounded-3xl border border-zinc-200 bg-zinc-50 p-6">
           <div className="text-base font-semibold">Ready to book?</div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
+import { ImageListField } from '@/components/admin/ImageListField';
 import { Button } from '@/components/ui/Button';
 
 export type BlogPostRow = {
@@ -28,6 +29,25 @@ export function BlogPostsManager({ posts }: { posts: BlogPostRow[] }) {
   const [seoTitle, setSeoTitle] = React.useState('');
   const [seoDescription, setSeoDescription] = React.useState('');
   const [ogImage, setOgImage] = React.useState('');
+  const [inlineImages, setInlineImages] = React.useState<string[]>([]);
+
+  const slugOk = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+  const lastInlineCount = React.useRef(0);
+
+  React.useEffect(() => {
+    if (inlineImages.length <= lastInlineCount.current) {
+      lastInlineCount.current = inlineImages.length;
+      return;
+    }
+    const newUrls = inlineImages.slice(lastInlineCount.current);
+    lastInlineCount.current = inlineImages.length;
+    if (!newUrls.length) return;
+    setContent((current) => {
+      const trimmed = current.trimEnd();
+      const inject = newUrls.map((url) => `![Image](${url})`).join('\n');
+      return trimmed ? `${trimmed}\n\n${inject}\n` : `${inject}\n`;
+    });
+  }, [inlineImages]);
 
   const onCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +80,7 @@ export function BlogPostsManager({ posts }: { posts: BlogPostRow[] }) {
         setSeoTitle('');
         setSeoDescription('');
         setOgImage('');
+        setInlineImages([]);
         router.refresh();
       } catch (err) {
         toast.error('Could not create post', {
@@ -97,63 +118,103 @@ export function BlogPostsManager({ posts }: { posts: BlogPostRow[] }) {
 
       <form onSubmit={onCreate} className="grid gap-3 rounded-3xl border border-zinc-200 bg-zinc-50 p-5">
         <div className="text-sm font-semibold">Create post</div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm md:col-span-2"
-            required
-          />
-          <input
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder="Slug (e.g. pay-now-vs-pay-later)"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-            required
-          />
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT')}
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-          >
-            <option value="DRAFT">Draft</option>
-            <option value="PUBLISHED">Published</option>
-          </select>
-          <textarea
-            value={excerpt}
-            onChange={(e) => setExcerpt(e.target.value)}
-            rows={2}
-            placeholder="Excerpt (optional)"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm md:col-span-2"
-          />
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={6}
-            placeholder="Content"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm md:col-span-2"
-            required
-          />
-          <input
-            value={seoTitle}
-            onChange={(e) => setSeoTitle(e.target.value)}
-            placeholder="SEO title (optional)"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm md:col-span-2"
-          />
-          <textarea
-            value={seoDescription}
-            onChange={(e) => setSeoDescription(e.target.value)}
-            rows={2}
-            placeholder="SEO description (optional)"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm md:col-span-2"
-          />
-          <input
-            value={ogImage}
-            onChange={(e) => setOgImage(e.target.value)}
-            placeholder="OG image path (optional) e.g. /images/bg_2.jpg"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm md:col-span-2"
-          />
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">Title</label>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+              placeholder="Pay now vs pay later"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Slug</label>
+            <input
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-mono"
+              placeholder="pay-now-vs-pay-later"
+              pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Status</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT')}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+            >
+              <option value="DRAFT">Draft</option>
+              <option value="PUBLISHED">Published</option>
+            </select>
+          </div>
+
+          <div className="space-y-4 md:col-span-2">
+            <ImageListField
+              label="Featured image (optional)"
+              helpText="Used as the cover image (and OG image)."
+              prefix={slugOk ? `blog/${slug}` : ''}
+              multiple={false}
+              maxFiles={1}
+              value={ogImage ? [ogImage] : []}
+              onChange={(next) => setOgImage(next[0] ?? '')}
+              disabled={pending || !slugOk}
+            />
+            <ImageListField
+              label="Inline images (optional)"
+              helpText="Uploads are inserted into the content as ![Image](url)."
+              prefix={slugOk ? `blog/${slug}` : ''}
+              multiple
+              maxFiles={30}
+              value={inlineImages}
+              onChange={setInlineImages}
+              disabled={pending || !slugOk}
+            />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">Excerpt (optional)</label>
+            <textarea
+              value={excerpt}
+              onChange={(e) => setExcerpt(e.target.value)}
+              rows={2}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+              placeholder="Short summary shown on the blog index."
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">Content</label>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={8}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+              placeholder="Write your post content. Separate paragraphs with new lines."
+              required
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">SEO title (optional)</label>
+            <input
+              value={seoTitle}
+              onChange={(e) => setSeoTitle(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+              placeholder="SEO title"
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">SEO description (optional)</label>
+            <textarea
+              value={seoDescription}
+              onChange={(e) => setSeoDescription(e.target.value)}
+              rows={2}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+              placeholder="SEO description"
+            />
+          </div>
         </div>
         <Button type="submit" disabled={pending}>
           {pending ? 'Creating…' : 'Create post'}

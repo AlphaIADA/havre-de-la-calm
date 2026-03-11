@@ -9,7 +9,9 @@ const updateSchema = z.object({
   name: z.string().min(2).max(200).optional(),
   location: z.string().min(2).max(200).optional(),
   description: z.string().min(10).max(2000).optional(),
+  address: z.string().max(500).optional().nullable(),
   heroImage: z.string().max(500).optional().nullable(),
+  gallery: z.array(z.string().max(500)).optional(),
   active: z.boolean().optional(),
 });
 
@@ -30,7 +32,9 @@ export async function PATCH(
       name: body.name,
       location: body.location,
       description: body.description,
+      address: body.address === null ? null : body.address,
       heroImage: body.heroImage === null ? null : body.heroImage,
+      gallery: body.gallery,
       active: body.active,
     },
   });
@@ -44,4 +48,3 @@ export async function PATCH(
 
   return NextResponse.json({ property: updated });
 }
-

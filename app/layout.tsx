@@ -6,6 +6,7 @@ import '@/app/globals.css';
 
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { SiteHeader } from '@/components/site/SiteHeader';
+import { ChatWidget } from '@/components/site/ChatWidget';
 import { AppToaster } from '@/components/ui/Toaster';
 
 export const metadata: Metadata = {
@@ -43,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <SiteHeader />
             <main>{children}</main>
             <SiteFooter />
+            <ChatWidget />
           </div>
         )}
         <AppToaster />

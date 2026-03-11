@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
+import { ImageListField } from '@/components/admin/ImageListField';
 import { Button } from '@/components/ui/Button';
 
 type Property = {
@@ -17,6 +18,10 @@ type Property = {
   active: boolean;
 };
 
+function isValidSlug(value: string) {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
+}
+
 export function PropertiesManager({ properties }: { properties: Property[] }) {
   const router = useRouter();
   const [pending, startTransition] = React.useTransition();
@@ -26,11 +31,15 @@ export function PropertiesManager({ properties }: { properties: Property[] }) {
   const [location, setLocation] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [heroImage, setHeroImage] = React.useState('');
+  const [gallery, setGallery] = React.useState<string[]>([]);
+
+  const slugOk = isValidSlug(slug);
 
   const onCreate = (e: React.FormEvent) => {
     e.preventDefault();
     startTransition(async () => {
       try {
+        const hero = heroImage.trim() ? heroImage.trim() : gallery[0] ? gallery[0] : null;
         const res = await fetch('/api/admin/properties', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
@@ -39,7 +48,8 @@ export function PropertiesManager({ properties }: { properties: Property[] }) {
             name,
             location,
             description,
-            heroImage: heroImage || null,
+            heroImage: hero,
+            gallery,
           }),
         });
         if (!res.ok) {
@@ -52,6 +62,7 @@ export function PropertiesManager({ properties }: { properties: Property[] }) {
         setLocation('');
         setDescription('');
         setHeroImage('');
+        setGallery([]);
         router.refresh();
       } catch (err) {
         toast.error('Could not create property', {
@@ -89,42 +100,74 @@ export function PropertiesManager({ properties }: { properties: Property[] }) {
 
       <form onSubmit={onCreate} className="grid gap-3 rounded-3xl border border-zinc-200 bg-zinc-50 p-5">
         <div className="text-sm font-semibold">Create property</div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Name"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-            required
-          />
-          <input
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder="Slug (e.g. havre-de-la-calme-ota)"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-            required
-          />
-          <input
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="Location (e.g. Ota, Ogun State)"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm md:col-span-2"
-            required
-          />
-          <input
-            value={heroImage}
-            onChange={(e) => setHeroImage(e.target.value)}
-            placeholder="Hero image path (optional, e.g. /images/havre front.jpg)"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm md:col-span-2"
-          />
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Description"
-            rows={3}
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm md:col-span-2"
-            required
-          />
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">Name</label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+              placeholder="Havre De La Calme"
+              required
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">Slug</label>
+            <input
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-mono"
+              placeholder="havre-de-la-calme-ota"
+              required
+              pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            />
+            <div className="text-xs text-zinc-500">Used in URLs: /properties/&lt;slug&gt;</div>
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">Location</label>
+            <input
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+              placeholder="Ota, Ogun State"
+              required
+            />
+          </div>
+
+          <div className="space-y-4 md:col-span-2">
+            <ImageListField
+              label="Hero image"
+              helpText="Upload a cover image (Cloudflare R2) or paste a /public image path."
+              prefix={slugOk ? `properties/${slug}` : ''}
+              multiple={false}
+              maxFiles={1}
+              value={heroImage ? [heroImage] : []}
+              onChange={(next) => setHeroImage(next[0] ?? '')}
+              disabled={pending || !slugOk}
+            />
+            <ImageListField
+              label="Gallery images"
+              helpText="Upload multiple images and reorder them."
+              prefix={slugOk ? `properties/${slug}` : ''}
+              multiple
+              maxFiles={20}
+              value={gallery}
+              onChange={setGallery}
+              disabled={pending || !slugOk}
+            />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium">Description</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+              placeholder="Describe the property, neighborhood, and what makes it special."
+              required
+            />
+          </div>
         </div>
         <Button type="submit" disabled={pending}>
           {pending ? 'Creating…' : 'Create property'}

@@ -1,8 +1,8 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { UnitInquiryForm } from '@/components/booking/UnitInquiryForm';
+import { StayGallery } from '@/components/stay/StayGallery';
 import { Button } from '@/components/ui/Button';
 import { demoProperties, getDemoUnitBySlug } from '@/lib/demoData';
 import { getUnitBySlug, jsonStringArray } from '@/lib/data/properties';
@@ -41,6 +41,12 @@ export default async function StayPage({ params }: { params: Promise<{ unitSlug:
     : (demoProperties.find((p) => p.slug === unit.propertySlug) ?? null);
 
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://otaapartments.com').replace(/\/$/, '');
+  const jsonLdImage =
+    unit.images?.[0] && unit.images[0].startsWith('http')
+      ? unit.images[0]
+      : unit.images?.[0]
+        ? `${baseUrl}${unit.images[0]}`
+        : null;
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Accommodation',
@@ -48,7 +54,7 @@ export default async function StayPage({ params }: { params: Promise<{ unitSlug:
     url: `${baseUrl}/stay/${unit.slug}`,
     name: property ? `${unit.name} — ${property.name}` : unit.name,
     description: unit.summary,
-    image: unit.images?.[0] ? [`${baseUrl}${unit.images[0]}`] : undefined,
+    image: jsonLdImage ? [jsonLdImage] : undefined,
     amenityFeature: (unit.amenities ?? []).map((a) => ({
       '@type': 'LocationFeatureSpecification',
       name: a,
@@ -74,18 +80,7 @@ export default async function StayPage({ params }: { params: Promise<{ unitSlug:
             <p className="text-sm text-zinc-700">{unit.summary}</p>
           </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 md:col-span-2 md:aspect-[16/10]">
-              <Image src={unit.images[0] ?? '/images/bg_1.jpg'} alt={unit.name} fill className="object-cover" />
-            </div>
-            <div className="grid gap-4">
-              {(unit.images.slice(1, 3) ?? []).map((src) => (
-                <div key={src} className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100">
-                  <Image src={src} alt={unit.name} fill className="object-cover" />
-                </div>
-              ))}
-            </div>
-          </div>
+          <StayGallery images={unit.images} alt={unit.name} />
 
           <div className="mt-10 grid gap-8 md:grid-cols-2">
             <div className="rounded-3xl border border-zinc-200 bg-white p-6">

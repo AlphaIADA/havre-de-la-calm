@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { PropertyEditor } from '@/components/admin/PropertyEditor';
 import { getPrisma } from '@/lib/prisma';
+import { jsonStringArray } from '@/lib/data/properties';
 
 export const metadata = { title: 'Edit property' };
 export const dynamic = 'force-dynamic';
@@ -22,8 +23,19 @@ export default async function AdminPropertyEditPage({
       <Link href="/admin/properties" className="text-sm font-medium text-zinc-900 hover:underline">
         ← Back to properties
       </Link>
-      <PropertyEditor property={property} />
+      <PropertyEditor
+        property={{
+          id: property.id,
+          slug: property.slug,
+          name: property.name,
+          location: property.location,
+          description: property.description,
+          address: property.address ?? null,
+          heroImage: property.heroImage ?? null,
+          gallery: jsonStringArray(property.gallery),
+          active: property.active,
+        }}
+      />
     </div>
   );
 }
-

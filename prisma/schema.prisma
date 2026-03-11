@@ -81,6 +81,12 @@ enum BlogPostStatus {
   PUBLISHED
 }
 
+enum BlogCommentStatus {
+  PENDING
+  APPROVED
+  HIDDEN
+}
+
 enum EmailCampaignStatus {
   DRAFT
   SENDING
@@ -102,6 +108,7 @@ model User {
   kycDocsReviewed KycDocument[]  @relation("KycDocReviewedBy")
   messagesSent   Message[]
   postsCreated   BlogPost[]
+  blogCommentsModerated BlogComment[] @relation("BlogCommentModeratedBy")
 }
 
 model Property {
@@ -188,6 +195,7 @@ model Booking {
   nightlyTotal Int
   cleaningFee  Int          @default(0)
   depositFee   Int          @default(0)
+  extraCharges Json?
   totalAmount  Int
 
   guestName   String
@@ -396,6 +404,8 @@ model BlogPost {
   category  BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   createdBy User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
   tags      BlogPostTag[]
+  comments  BlogComment[]
+  reactions BlogReaction[]
 }
 
 model BlogPostTag {
@@ -407,6 +417,41 @@ model BlogPostTag {
 
   @@id([postId, tagId])
   @@index([tagId])
+}
+
+model BlogComment {
+  id            String            @id @default(cuid())
+  postId        String
+  status        BlogCommentStatus @default(PENDING)
+  name          String
+  email         String?
+  body          String
+
+  approvedAt    DateTime?
+  moderatedById String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  post          BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  moderatedBy   User?    @relation("BlogCommentModeratedBy", fields: [moderatedById], references: [id], onDelete: SetNull)
+
+  @@index([postId])
+  @@index([status])
+}
+
+model BlogReaction {
+  id        String   @id @default(cuid())
+  postId    String
+  emoji     String
+  count     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, emoji])
+  @@index([postId])
 }
 
 model EmailSegment {

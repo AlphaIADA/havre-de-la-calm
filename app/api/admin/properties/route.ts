@@ -14,7 +14,9 @@ const createSchema = z.object({
   name: z.string().min(2).max(200),
   location: z.string().min(2).max(200),
   description: z.string().min(10).max(2000),
+  address: z.string().max(500).optional().nullable(),
   heroImage: z.string().max(500).optional().nullable(),
+  gallery: z.array(z.string().max(500)).optional(),
   active: z.boolean().optional(),
 });
 
@@ -40,7 +42,9 @@ export async function POST(req: Request) {
       name: body.name,
       location: body.location,
       description: body.description,
+      address: body.address ?? undefined,
       heroImage: body.heroImage ?? undefined,
+      gallery: body.gallery ?? undefined,
       active: body.active ?? true,
     },
   });
@@ -55,4 +59,3 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ property: created }, { status: 201 });
 }
-

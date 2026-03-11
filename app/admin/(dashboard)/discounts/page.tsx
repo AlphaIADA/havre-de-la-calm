@@ -25,6 +25,8 @@ export default async function AdminDiscountsPage() {
     redeemedCount: p.redeemedCount,
     maxRedemptions: p.maxRedemptions,
     expiresAt: p.expiresAt?.toISOString() ?? null,
+    propertyId: p.propertyId ?? null,
+    unitId: p.unitId ?? null,
     propertyName: p.property?.name ?? null,
     unitName: p.unit ? `${p.unit.property.name} — ${p.unit.name}` : null,
   }));

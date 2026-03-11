@@ -17,3 +17,18 @@ export async function getBlogPostBySlug(slug: string) {
   return post;
 }
 
+export async function getPublishedBlogPostWithEngagement(slug: string) {
+  const prisma = getPrisma();
+  const post = await prisma.blogPost.findFirst({
+    where: { slug, status: 'PUBLISHED' },
+    include: {
+      comments: {
+        where: { status: 'APPROVED' },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      },
+      reactions: { orderBy: [{ count: 'desc' }, { emoji: 'asc' }] },
+    },
+  });
+  return post;
+}

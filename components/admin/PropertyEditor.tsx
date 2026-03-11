@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
+import { ImageListField } from '@/components/admin/ImageListField';
 import { Button } from '@/components/ui/Button';
 
 type Property = {
@@ -14,6 +15,7 @@ type Property = {
   description: string;
   address: string | null;
   heroImage: string | null;
+  gallery: string[];
   active: boolean;
 };
 
@@ -26,11 +28,13 @@ export function PropertyEditor({ property }: { property: Property }) {
   const [description, setDescription] = React.useState(property.description);
   const [address, setAddress] = React.useState(property.address ?? '');
   const [heroImage, setHeroImage] = React.useState(property.heroImage ?? '');
+  const [gallery, setGallery] = React.useState<string[]>(property.gallery ?? []);
 
   const onSave = (e: React.FormEvent) => {
     e.preventDefault();
     startTransition(async () => {
       try {
+        const hero = heroImage.trim() ? heroImage.trim() : gallery[0] ? gallery[0] : null;
         const res = await fetch(`/api/admin/properties/${property.id}`, {
           method: 'PATCH',
           headers: { 'content-type': 'application/json' },
@@ -39,7 +43,8 @@ export function PropertyEditor({ property }: { property: Property }) {
             location,
             description,
             address: address || null,
-            heroImage: heroImage || null,
+            heroImage: hero,
+            gallery,
           }),
         });
         const body = await res.json().catch(() => ({}));
@@ -89,13 +94,26 @@ export function PropertyEditor({ property }: { property: Property }) {
               className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
             />
           </div>
-          <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-medium">Hero image path (optional)</label>
-            <input
-              value={heroImage}
-              onChange={(e) => setHeroImage(e.target.value)}
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-              placeholder="/images/..."
+          <div className="space-y-4 md:col-span-2">
+            <ImageListField
+              label="Hero image"
+              helpText="Upload a cover image (Cloudflare R2) or paste a /public image path."
+              prefix={`properties/${property.slug}`}
+              multiple={false}
+              maxFiles={1}
+              value={heroImage ? [heroImage] : []}
+              onChange={(next) => setHeroImage(next[0] ?? '')}
+              disabled={pending}
+            />
+            <ImageListField
+              label="Gallery images"
+              helpText="Upload multiple images and reorder them."
+              prefix={`properties/${property.slug}`}
+              multiple
+              maxFiles={20}
+              value={gallery}
+              onChange={setGallery}
+              disabled={pending}
             />
           </div>
           <div className="space-y-2 md:col-span-2">
@@ -117,4 +135,3 @@ export function PropertyEditor({ property }: { property: Property }) {
     </div>
   );
 }
-

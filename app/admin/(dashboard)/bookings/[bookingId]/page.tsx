@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { BookingEditor } from '@/components/admin/BookingEditor';
 import { formatDateOnly } from '@/lib/dateOnly';
+import { parseExtraCharges } from '@/lib/extraCharges';
 import { getPrisma } from '@/lib/prisma';
 
 export const metadata = { title: 'Edit booking' };
@@ -49,6 +50,7 @@ export default async function AdminBookingEditPage({
           nightlyTotal: booking.nightlyTotal,
           cleaningFee: booking.cleaningFee,
           depositFee: booking.depositFee,
+          extraCharges: parseExtraCharges(booking.extraCharges),
           discountAmount: booking.discountAmount,
           totalAmount: booking.totalAmount,
           promoCode: booking.promoCode?.code ?? null,
@@ -68,4 +70,3 @@ export default async function AdminBookingEditPage({
     </div>
   );
 }
-

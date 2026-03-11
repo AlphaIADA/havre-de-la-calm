@@ -15,6 +15,7 @@ Multi-property short-stay booking platform with:
 - Tailwind CSS
 - Resend (optional)
 - Cloudinary private uploads (KYC docs)
+- Cloudflare R2 (public images: properties/units/blog)
 - Paystack (optional)
 
 ## Node version
@@ -63,6 +64,15 @@ KYC documents are uploaded to Cloudinary as **private** assets. Guests can uploa
 - `CLOUDINARY_API_KEY`
 - `CLOUDINARY_API_SECRET`
 
+### Uploads (public images) — Cloudflare R2
+Admin image uploads (properties/units/blog) use Cloudflare R2 via presigned PUT URLs.
+- `CLOUDFLARE_R2_ACCOUNT_ID`
+- `CLOUDFLARE_R2_ACCESS_KEY_ID`
+- `CLOUDFLARE_R2_SECRET_ACCESS_KEY`
+- `CLOUDFLARE_R2_BUCKET`
+- `CLOUDFLARE_R2_PUBLIC_URL` (public base URL for your bucket; used for rendering images)
+- `CLOUDFLARE_R2_REGION` (optional, defaults to `auto`)
+
 ### Paystack (optional)
 If keys are not set, **Pay Now is hidden automatically**.
 - `PAYSTACK_SECRET_KEY` (optional)
@@ -90,7 +100,7 @@ If not set, emails are skipped silently.
 - Run `npm run prisma:migrate` then `npm run db:seed`.
 
 ## Vercel domain + subdomain routing (checkin)
-This repo uses host-based rewrites in `next.config.js`:
+This repo uses host-based routing via `middleware.ts`:
 - Requests on `checkin.<rootDomain>` are rewritten to `/checkin/*`.
 
 In Vercel:

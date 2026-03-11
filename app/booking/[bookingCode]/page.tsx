@@ -7,6 +7,7 @@ import { KycUploadForm } from '@/components/booking/KycUploadForm';
 import { Button } from '@/components/ui/Button';
 import { isCloudinaryConfigured } from '@/lib/cloudinary';
 import { isDbConfigured } from '@/lib/env';
+import { parseExtraCharges } from '@/lib/extraCharges';
 import { getPrisma } from '@/lib/prisma';
 
 export const metadata = {
@@ -65,6 +66,9 @@ export default async function BookingPortalPage({
       createdAt: d.createdAt.toISOString(),
     })) ?? [];
 
+  const extraCharges = parseExtraCharges(booking.extraCharges);
+  const extraChargesTotal = extraCharges.reduce((sum, c) => sum + (Number.isFinite(c.amount) ? c.amount : 0), 0);
+
   return (
     <div className="container-px py-10">
       <div className="max-w-2xl">
@@ -118,6 +122,14 @@ export default async function BookingPortalPage({
                   ₦{booking.totalAmount.toLocaleString()}
                 </span>
               </div>
+              {extraChargesTotal ? (
+                <div>
+                  <span className="text-zinc-500">Extra charges:</span>{' '}
+                  <span className="font-medium text-zinc-900">
+                    ₦{extraChargesTotal.toLocaleString()}
+                  </span>
+                </div>
+              ) : null}
               {booking.discountAmount ? (
                 <div>
                   <span className="text-zinc-500">Discount:</span>{' '}
@@ -130,6 +142,20 @@ export default async function BookingPortalPage({
                 </div>
               ) : null}
             </div>
+
+            {extraCharges.length ? (
+              <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-700">
+                <div className="text-sm font-semibold">Extra charges</div>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {extraCharges.map((c) => (
+                    <li key={c.label} className="flex items-center justify-between gap-4">
+                      <span>{c.label}</span>
+                      <span className="font-medium">₦{c.amount.toLocaleString()}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
 
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/contact">

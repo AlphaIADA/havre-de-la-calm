@@ -8,6 +8,7 @@ import { writeAuditLog } from '@/lib/audit';
 import { sendEmail } from '@/lib/email';
 import { parseDateOnly } from '@/lib/dateOnly';
 import { calculatePrice } from '@/lib/pricing';
+import { extraChargeSchema, parseExtraCharges } from '@/lib/extraCharges';
 
 const patchSchema = z.object({
   status: z
@@ -22,6 +23,10 @@ const patchSchema = z.object({
   cleaningFee: z.number().int().min(0).max(10_000_000).optional(),
   depositFee: z.number().int().min(0).max(10_000_000).optional(),
   discountAmount: z.number().int().min(0).max(10_000_000).optional(),
+  extraCharges: z
+    .array(extraChargeSchema)
+    .max(20)
+    .optional(),
   recalculatePricing: z.boolean().optional(),
   markOfflinePaymentReceived: z.boolean().optional(),
   paymentAmount: z.number().int().min(0).max(10_000_000).optional(),
@@ -116,11 +121,17 @@ export async function PATCH(req: Request, context: { params: Promise<{ bookingId
   const nextNightlyTotal = typeof body.nightlyTotal === 'number' ? body.nightlyTotal : computedNightlyTotal;
   const nextCleaningFee = typeof body.cleaningFee === 'number' ? body.cleaningFee : computedCleaningFee;
   const nextDepositFee = typeof body.depositFee === 'number' ? body.depositFee : computedDepositFee;
+  const existingExtraCharges = parseExtraCharges(booking.extraCharges);
+  const nextExtraCharges = body.extraCharges ?? existingExtraCharges;
+  const extraChargesTotal = nextExtraCharges.reduce((sum, c) => sum + (Number.isFinite(c.amount) ? c.amount : 0), 0);
   const nextDiscountAmount = Math.min(
     nextNightlyTotal,
     typeof body.discountAmount === 'number' ? body.discountAmount : booking.discountAmount,
   );
-  const nextTotalAmount = Math.max(0, nextNightlyTotal - nextDiscountAmount + nextCleaningFee + nextDepositFee);
+  const nextTotalAmount = Math.max(
+    0,
+    nextNightlyTotal - nextDiscountAmount + nextCleaningFee + nextDepositFee + extraChargesTotal,
+  );
 
   const updated = await prisma.booking.update({
     where: { id: bookingId },
@@ -135,13 +146,15 @@ export async function PATCH(req: Request, context: { params: Promise<{ bookingId
       nightlyTotal: recalc || typeof body.nightlyTotal === 'number' ? nextNightlyTotal : undefined,
       cleaningFee: recalc || typeof body.cleaningFee === 'number' ? nextCleaningFee : undefined,
       depositFee: recalc || typeof body.depositFee === 'number' ? nextDepositFee : undefined,
+      extraCharges: body.extraCharges,
       discountAmount: recalc || typeof body.discountAmount === 'number' ? nextDiscountAmount : undefined,
       totalAmount:
         recalc ||
         typeof body.nightlyTotal === 'number' ||
         typeof body.cleaningFee === 'number' ||
         typeof body.depositFee === 'number' ||
-        typeof body.discountAmount === 'number'
+        typeof body.discountAmount === 'number' ||
+        body.extraCharges !== undefined
           ? nextTotalAmount
           : undefined,
     },

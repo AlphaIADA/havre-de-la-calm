@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
+import { ImageListField } from '@/components/admin/ImageListField';
 import { Button } from '@/components/ui/Button';
 
 type Post = {
@@ -34,6 +35,23 @@ export function BlogPostEditor({ post }: { post: Post }) {
   const [seoTitle, setSeoTitle] = React.useState(post.seoTitle);
   const [seoDescription, setSeoDescription] = React.useState(post.seoDescription);
   const [ogImage, setOgImage] = React.useState(post.ogImage);
+  const [inlineImages, setInlineImages] = React.useState<string[]>([]);
+  const lastInlineCount = React.useRef(0);
+
+  React.useEffect(() => {
+    if (inlineImages.length <= lastInlineCount.current) {
+      lastInlineCount.current = inlineImages.length;
+      return;
+    }
+    const newUrls = inlineImages.slice(lastInlineCount.current);
+    lastInlineCount.current = inlineImages.length;
+    if (!newUrls.length) return;
+    setContent((current) => {
+      const trimmed = current.trimEnd();
+      const inject = newUrls.map((url) => `![Image](${url})`).join('\n');
+      return trimmed ? `${trimmed}\n\n${inject}\n` : `${inject}\n`;
+    });
+  }, [inlineImages]);
 
   const onSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,12 +126,27 @@ export function BlogPostEditor({ post }: { post: Post }) {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">OG image (optional)</label>
-              <input
-                value={ogImage}
-                onChange={(e) => setOgImage(e.target.value)}
-                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
-                placeholder="/images/bg_2.jpg"
+              <ImageListField
+                label="Featured image (optional)"
+                helpText="Used as the cover image (and OG image)."
+                prefix={`blog/${post.slug}`}
+                multiple={false}
+                maxFiles={1}
+                value={ogImage ? [ogImage] : []}
+                onChange={(next) => setOgImage(next[0] ?? '')}
+                disabled={pending}
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <ImageListField
+                label="Inline images (optional)"
+                helpText="Uploads are inserted into the content as ![Image](url)."
+                prefix={`blog/${post.slug}`}
+                multiple
+                maxFiles={50}
+                value={inlineImages}
+                onChange={setInlineImages}
+                disabled={pending}
               />
             </div>
             <div className="space-y-2 md:col-span-2">
@@ -164,4 +197,3 @@ export function BlogPostEditor({ post }: { post: Post }) {
     </div>
   );
 }
-
